@@ -1,4 +1,4 @@
-# Binary Results Export
+# Binary Results Reader
 Version 3.0
 August 2016
 ## Contents
