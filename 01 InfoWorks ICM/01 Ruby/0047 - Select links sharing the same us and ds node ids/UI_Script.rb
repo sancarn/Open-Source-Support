@@ -1,20 +1,20 @@
-net=WSApplication.current_network
-net.clear_selection
-links_list_all=Array.new
+net = WSApplication.current_network
 
-# Creates an array of arrays containing the unique link id and the upstream and downstream nodes of each link.
-net.row_objects('_links').each do |link|
-  usds = link.us_node_id + link.ds_node_id
-  links_list_all << [usds, link.id]
+#Clear selection
+net.clear_selection
+
+#Construct dictionary which links us_node_id and ds_node_id to the links which share them
+links = {}
+net.row_object_collection('_links').each do |link|
+  uid  = link.us_node_id+"."+link.ds_node_id
+  (links[uid] ||= []).push(link)
 end
 
-# Groups all links by their respective us/ds node ids
-group_by_usds = links_list_all.group_by { |usds| usds.shift }.transform_values { |values| values.flatten }
-
-# Filters groups with us/ds showing more than once and converts hash to a flattened array of links
-link_list_sel = group_by_usds.select { |key, value| value.length > 1 }.values.flatten
-
-# Selects only links from the list above on the active network
-net.row_objects('_links').each do |link|
-  link.selected=true if link_list_sel.include?(link.id)
+#Select where link array length > 1
+links.select do |key,value|
+  value.length > 1
+end.each do |arr|
+  arr[1].each do |link|
+    link.selected = true
+  end
 end
